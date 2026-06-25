@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ruchir Ukey — Video Editor & Thumbnail Designer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black:   #0a0a0a;
+    --dark:    #111111;
+    --card:    #181818;
+    --border:  #2a2a2a;
+    --red:     #e8001c;
+    --red-dim: #8a0010;
+    --white:   #f0ede8;
+    --grey:    #888888;
+    --mono: 'Space Mono', monospace;
+    --body: 'Inter', sans-serif;
+    --display: 'Bebas Neue', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 40px;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: var(--display);
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--red); }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--grey);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 40px 60px;
+    position: relative;
+    overflow: hidden;
+    padding-top: 80px;
+  }
+
+  /* Signature element: giant sliced title */
+  .hero-bg-text {
+    position: absolute;
+    top: 50%;
+    left: -10px;
+    transform: translateY(-55%);
+    font-family: var(--display);
+    font-size: clamp(120px, 20vw, 240px);
+    line-height: 0.85;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(232,0,28,0.12);
+    pointer-events: none;
+    user-select: none;
+    letter-spacing: -2px;
+    white-space: nowrap;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 16px;
+  }
+
+  .hero-name {
+    font-family: var(--display);
+    font-size: clamp(64px, 10vw, 120px);
+    line-height: 0.9;
+    letter-spacing: -1px;
+    color: var(--white);
+    position: relative;
+  }
+  .hero-name .slash {
+    color: var(--red);
+    margin: 0 4px;
+  }
+
+  .hero-tagline {
+    margin-top: 24px;
+    max-width: 520px;
+    font-size: 16px;
+    color: var(--grey);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    margin-top: 48px;
+  }
+  .hero-stat-num {
+    font-family: var(--display);
+    font-size: 40px;
+    color: var(--white);
+    line-height: 1;
+  }
+  .hero-stat-num span { color: var(--red); }
+  .hero-stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-top: 4px;
+  }
+
+  .hero-cta {
+    margin-top: 48px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .btn-primary {
+    display: inline-block;
+    padding: 14px 32px;
+    background: var(--red);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { background: #c0001a; transform: translateY(-1px); }
+
+  .btn-ghost {
+    display: inline-block;
+    padding: 14px 32px;
+    border: 1px solid var(--border);
+    color: var(--grey);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--white); color: var(--white); }
+
+  /* ── SECTION SHARED ── */
+  section {
+    padding: 96px 40px;
+    border-top: 1px solid var(--border);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: var(--display);
+    font-size: clamp(40px, 5vw, 64px);
+    line-height: 0.95;
+    color: var(--white);
+    margin-bottom: 48px;
+  }
+
+  /* ── ABOUT ── */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+  .about-body {
+    font-size: 15px;
+    color: var(--grey);
+    line-height: 1.8;
+  }
+  .about-body p + p { margin-top: 16px; }
+  .about-body strong { color: var(--white); font-weight: 500; }
+
+  .about-highlight {
+    font-family: var(--display);
+    font-size: 32px;
+    color: var(--white);
+    line-height: 1.1;
+    border-left: 3px solid var(--red);
+    padding-left: 20px;
+    margin-bottom: 32px;
+  }
+
+  /* ── EXPERIENCE ── */
+  .exp-item {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 40px;
+    padding: 40px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .exp-item:first-of-type { border-top: 1px solid var(--border); }
+
+  .exp-meta {
+    padding-top: 4px;
+  }
+  .exp-period {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--red);
+    letter-spacing: 1px;
+  }
+  .exp-company {
+    font-size: 13px;
+    color: var(--grey);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  .exp-role {
+    font-family: var(--display);
+    font-size: 28px;
+    color: var(--white);
+    margin-bottom: 16px;
+    line-height: 1;
+  }
+  .exp-bullets {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .exp-bullets li {
+    color: var(--grey);
+    font-size: 14px;
+    line-height: 1.6;
+    padding-left: 20px;
+    position: relative;
+  }
+  .exp-bullets li::before {
+    content: '—';
+    position: absolute; left: 0;
+    color: var(--red-dim);
+    font-family: var(--mono);
+  }
+
+  /* ── SKILLS ── */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 2px;
+  }
+  .skill-card {
+    background: var(--card);
+    padding: 28px 24px;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s, background 0.2s;
+    cursor: default;
+  }
+  .skill-card:hover {
+    border-color: var(--red);
+    background: #1e1010;
+  }
+  .skill-icon {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+  .skill-name {
+    font-family: var(--display);
+    font-size: 20px;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+  .skill-desc {
+    font-size: 12px;
+    color: var(--grey);
+    line-height: 1.5;
+  }
+
+  /* ── WORKFLOW ── */
+  .workflow-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 8px;
+  }
+  .wf-step {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 32px 24px;
+  }
+  .wf-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--red);
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .wf-title {
+    font-family: var(--display);
+    font-size: 24px;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .wf-body {
+    font-size: 13px;
+    color: var(--grey);
+    line-height: 1.6;
+  }
+
+  /* ── WHAT I OFFER ── */
+  .offer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+  .offer-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 36px 32px;
+    transition: border-color 0.2s;
+  }
+  .offer-card:hover { border-color: var(--red); }
+  .offer-title {
+    font-family: var(--display);
+    font-size: 26px;
+    color: var(--white);
+    margin-bottom: 12px;
+  }
+  .offer-body {
+    font-size: 14px;
+    color: var(--grey);
+    line-height: 1.7;
+  }
+
+  /* ── CONTACT ── */
+  .contact-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+  .contact-big {
+    font-family: var(--display);
+    font-size: clamp(48px, 7vw, 90px);
+    line-height: 0.9;
+    color: var(--white);
+  }
+  .contact-big span { color: var(--red); }
+
+  .contact-links { display: flex; flex-direction: column; gap: 16px; }
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    transition: padding-left 0.2s;
+  }
+  .contact-link:hover { padding-left: 8px; }
+  .contact-link-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red);
+    min-width: 80px;
+  }
+  .contact-link-value {
+    font-size: 15px;
+    color: var(--grey);
+    transition: color 0.2s;
+  }
+  .contact-link:hover .contact-link-value { color: var(--white); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .footer-copy {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--grey);
+    letter-spacing: 1px;
+  }
+  .footer-back {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--grey);
+    text-decoration: none;
+    letter-spacing: 1px;
+    transition: color 0.2s;
+  }
+  .footer-back:hover { color: var(--white); }
+
+  /* ── GALLERY ── */
+  .gallery-category { margin-bottom: 56px; }
+  .gallery-category:last-child { margin-bottom: 0; }
+  .gallery-cat-label { margin-bottom: 20px; }
+  .cat-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--white);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    background: var(--card);
+  }
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .video-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .video-card:hover { border-color: var(--red); transform: translateY(-2px); }
+  .video-wrap {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+  }
+  .video-wrap--short { padding-bottom: 177.78%; }
+  .video-wrap iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: none;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    .hero { padding: 100px 20px 48px; }
+    section { padding: 64px 20px; }
+    .about-grid,
+    .contact-wrap,
+    .offer-grid { grid-template-columns: 1fr; gap: 32px; }
+    .video-grid,
+    .video-grid--shorts { grid-template-columns: repeat(2, 1fr); }
+    
+    .workflow-row { grid-template-columns: 1fr 1fr; }
+    .hero-stats { gap: 28px; flex-wrap: wrap; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  /* scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">RUCHIR<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg-text" aria-hidden="true">FRAME<br>CUTS<br>HITS</div>
+
+  <div class="hero-eyebrow">Video Editor &nbsp;/&nbsp; Thumbnail Designer</div>
+  <h1 class="hero-name">RUCHIR<br><span class="slash">/</span> UKEY</h1>
+  <p class="hero-tagline">
+    I turn raw footage into content people actually watch — and thumbnails they can't scroll past.
+    Finance, lifestyle, education, weddings — 5+ years cutting across every format.
+  </p>
+
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-num">5<span>+</span></div>
+      <div class="hero-stat-label">Years editing</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">100<span>+</span></div>
+      <div class="hero-stat-label">Wedding films</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">AI<span>—</span></div>
+      <div class="hero-stat-label">Powered workflow</div>
+    </div>
+  </div>
+
+  <div class="hero-cta">
+    <a href="#contact" class="btn-primary">Hire Me</a>
+    <a href="#experience" class="btn-ghost">See My Work</a>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">Who I Am</div>
+  <h2 class="section-title">Story<br>Behind<br>the Cut</h2>
+
+  <div class="about-grid reveal">
+    <div>
+      <div class="about-highlight">
+        I don't just edit videos — I build the story that keeps viewers watching.
+      </div>
+      <div class="about-body">
+        <p>
+          With <strong>5+ years of professional editing experience</strong>, I've worked across long-form YouTube content, social media reels, cinematic wedding films, and AI-powered design workflows.
+        </p>
+        <p>
+          Currently a <strong>Video Editor at Finnovationz Pvt. Ltd.</strong>, I handle everything from rough cut to final delivery — audio design, motion graphics, color grading, and thumbnails that push CTR.
+        </p>
+        <p>
+          I've built a <strong>reputation for fast turnaround</strong> without compromising quality, leveraging AI tools to streamline transcription, subtitles, and repurposing. My work is always client-first: your vision, refined.
+        </p>
+      </div>
+    </div>
+    <div class="about-body" style="padding-top: 4px;">
+      <p>
+        Before Finnovationz, I freelanced for <strong>3+ years</strong>, producing cinematic wedding highlights and social reels for photographers and studios across India. That period gave me something no single job could — the ability to handle the full production pipeline solo, under pressure, every time.
+      </p>
+      <p style="margin-top: 16px;">
+        I collaborate closely with creative teams, content marketers, and founders to ensure every frame serves a purpose. No filler. No generic cuts. Just content that earns attention.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-label">Career</div>
+  <h2 class="section-title">Where I've<br>Done the Work</h2>
+
+  <!-- Job 1 -->
+  <div class="exp-item reveal">
+    <div class="exp-meta">
+      <div class="exp-period">DEC 2023 — PRESENT</div>
+      <div class="exp-company">Finnovationz Pvt. Ltd.<br>Mumbai, India</div>
+    </div>
+    <div>
+      <div class="exp-role">Video Editor</div>
+      <ul class="exp-bullets">
+        <li>Edit long-form YouTube videos across finance, investing, and educational niches — optimised for retention and watch time.</li>
+        <li>Produce YouTube Shorts, Instagram Reels, and short-form clips that drive cross-platform reach.</li>
+        <li>Design high-converting thumbnails using AI-powered tools — directly improving CTR and audience growth.</li>
+        <li>Build AI-assisted workflows for transcription, subtitle generation, content repurposing, and faster delivery.</li>
+        <li>Handle full audio design: sound mixing, music selection, voice-over layering.</li>
+        <li>Manage end-to-end post-production: rough cut → colour grade → motion graphics → final export.</li>
+        <li>Upload and optimise videos with SEO-aligned titles, descriptions, chapters, and thumbnails.</li>
+        <li>Collaborate with content and marketing teams to grow audience retention and channel engagement.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Job 2 -->
+  <div class="exp-item reveal">
+    <div class="exp-meta">
+      <div class="exp-period">JAN 2021 — NOV 2023</div>
+      <div class="exp-company">Freelance<br>Video Editor</div>
+    </div>
+    <div>
+      <div class="exp-role">Freelance Editor</div>
+      <ul class="exp-bullets">
+        <li>Edited 100+ cinematic wedding highlight films for photographers, studios, and event companies.</li>
+        <li>Produced social media reels, corporate videos, event highlights, and promotional content.</li>
+        <li>Integrated AI tools to automate editing workflows, remove repetitive tasks, and maintain consistent quality.</li>
+        <li>Delivered short-form content optimised for Instagram, YouTube, and other social platforms.</li>
+        <li>Built a strong reputation for emotional storytelling, visual clarity, and fast, reliable turnaround.</li>
+        <li>Collaborated directly with clients to align every project with their creative vision and brand identity.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label">Tools &amp; Expertise</div>
+  <h2 class="section-title">What's in<br>My Kit</h2>
+
+  <div class="skills-grid reveal">
+    <div class="skill-card">
+      <div class="skill-icon">🎬</div>
+      <div class="skill-name">Premiere Pro</div>
+      <div class="skill-desc">Long-form YouTube, multi-cam edits, advanced timeline management</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-icon">✨</div>
+      <div class="skill-name">After Effects</div>
+      <div class="skill-desc">Motion graphics, animated titles, lower thirds, visual FX</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-icon">🎨</div>
+      <div class="skill-name">Photoshop</div>
+      <div class="skill-desc">Thumbnail design, compositing, retouching, creative key art</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-icon">🎞</div>
+      <div class="skill-name">DaVinci Resolve</div>
+      <div class="skill-desc">Colour grading, node-based colour science, finishing</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-icon">✂️</div>
+      <div class="skill-name">CapCut</div>
+      <div class="skill-desc">Fast short-form edits, reels, social-first content</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-icon">🤖</div>
+      <div class="skill-name">AI Workflows</div>
+      <div class="skill-desc">AI-powered transcription, auto-subtitles, content repurposing pipelines</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-icon">🎵</div>
+      <div class="skill-name">Audio Design</div>
+      <div class="skill-desc">Audio sync, music selection, sound mixing, voice layering</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-icon">📐</div>
+      <div class="skill-name">Colour Grading</div>
+      <div class="skill-desc">Cinematic looks, LUT application, brand-consistent colour</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW I WORK -->
+<section>
+  <div class="section-label">Process</div>
+  <h2 class="section-title">How a<br>Video Gets Made</h2>
+
+  <div class="workflow-row reveal">
+    <div class="wf-step">
+      <div class="wf-num">01 &mdash; BRIEF</div>
+      <div class="wf-title">Understand</div>
+      <div class="wf-body">I align on your goal, platform, audience, and tone before a single clip is touched.</div>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">02 &mdash; STRUCTURE</div>
+      <div class="wf-title">Story First</div>
+      <div class="wf-body">I build a narrative spine — hook, body, payoff — so the edit has direction before it has footage.</div>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">03 &mdash; CRAFT</div>
+      <div class="wf-title">Cut & Polish</div>
+      <div class="wf-body">Rough cut → sound mix → colour → graphics → thumbnail. Every layer refined before delivery.</div>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">04 &mdash; DELIVER</div>
+      <div class="wf-title">Fast & Right</div>
+      <div class="wf-body">Optimised export, platform specs, revision cycle included. You get it ready to publish.</div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK GALLERY -->
+<section id="work">
+  <div class="section-label">Portfolio</div>
+  <h2 class="section-title">The Work</h2>
+
+  <!-- Long Form -->
+  <div class="gallery-category reveal">
+    <div class="gallery-cat-label"><span class="cat-tag">Long-Form YouTube</span></div>
+    <div class="video-grid">
+      <div class="video-card"><div class="video-wrap"><iframe src="https://www.youtube.com/embed/gy862CYR6zQ" frameborder="0" allowfullscreen></iframe></div></div>
+      <div class="video-card"><div class="video-wrap"><iframe src="https://www.youtube.com/embed/5nzGM5ULGKA" frameborder="0" allowfullscreen></iframe></div></div>
+      <div class="video-card"><div class="video-wrap"><iframe src="https://www.youtube.com/embed/_jH4o61B_BM" frameborder="0" allowfullscreen></iframe></div></div>
+      <div class="video-card"><div class="video-wrap"><iframe src="https://www.youtube.com/embed/M2D7M1PKVFU" frameborder="0" allowfullscreen></iframe></div></div>
+    </div>
+  </div>
+
+  <!-- Shorts -->
+  <div class="gallery-category reveal">
+    <div class="gallery-cat-label"><span class="cat-tag">Shorts &amp; Quick Cuts</span></div>
+    <div class="video-grid video-grid--shorts">
+      <div class="video-card"><div class="video-wrap video-wrap--short"><iframe src="https://www.youtube.com/embed/uf7BlnZok6M" frameborder="0" allowfullscreen></iframe></div></div>
+      <div class="video-card"><div class="video-wrap video-wrap--short"><iframe src="https://www.youtube.com/embed/oKfLtZwoJUY" frameborder="0" allowfullscreen></iframe></div></div>
+      <div class="video-card"><div class="video-wrap video-wrap--short"><iframe src="https://www.youtube.com/embed/J36dQT5950w" frameborder="0" allowfullscreen></iframe></div></div>
+      <div class="video-card"><div class="video-wrap video-wrap--short"><iframe src="https://www.youtube.com/embed/Pg2o_LlMXuo" frameborder="0" allowfullscreen></iframe></div></div>
+    </div>
+  </div>
+
+  <!-- Wedding -->
+  <div class="gallery-category reveal">
+    <div class="gallery-cat-label"><span class="cat-tag">Wedding Films</span></div>
+    <div class="video-grid">
+      <div class="video-card"><div class="video-wrap"><iframe src="https://www.youtube.com/embed/H1qdfHScX0E" frameborder="0" allowfullscreen></iframe></div></div>
+      <div class="video-card"><div class="video-wrap"><iframe src="https://www.youtube.com/embed/4qEPDMhd2Rk" frameborder="0" allowfullscreen></iframe></div></div>
+      <div class="video-card"><div class="video-wrap"><iframe src="https://www.youtube.com/embed/JUD4HPQnudA" frameborder="0" allowfullscreen></iframe></div></div>
+      <div class="video-card"><div class="video-wrap"><iframe src="https://www.youtube.com/embed/LOv1nyPRkio" frameborder="0" allowfullscreen></iframe></div></div>
+    </div>
+  </div>
+
+  <!-- Reels -->
+  <div class="gallery-category reveal">
+    <div class="gallery-cat-label"><span class="cat-tag">Social Reels</span></div>
+    <div class="video-grid video-grid--shorts">
+      <div class="video-card"><div class="video-wrap video-wrap--short"><iframe src="https://www.youtube.com/embed/d89rV1BvaAU" frameborder="0" allowfullscreen></iframe></div></div>
+      <div class="video-card"><div class="video-wrap video-wrap--short"><iframe src="https://www.youtube.com/embed/aN5vThFJqNM" frameborder="0" allowfullscreen></iframe></div></div>
+      <div class="video-card"><div class="video-wrap video-wrap--short"><iframe src="https://www.youtube.com/embed/S5Esj9DPBoU" frameborder="0" allowfullscreen></iframe></div></div>
+      <div class="video-card"><div class="video-wrap video-wrap--short"><iframe src="https://www.youtube.com/embed/X4d1VPd0dtg" frameborder="0" allowfullscreen></iframe></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-label">What I Do</div>
+  <h2 class="section-title">Services</h2>
+
+  <div class="offer-grid reveal">
+    <div class="offer-card">
+      <div class="offer-title">Long-Form YouTube Editing</div>
+      <div class="offer-body">Finance, education, lifestyle, and talking-head content — cut for retention. Chapters, subtitles, motion graphics, and SEO thumbnails included.</div>
+    </div>
+    <div class="offer-card">
+      <div class="offer-title">Short-Form &amp; Reels</div>
+      <div class="offer-body">Fast-paced, hook-first edits for Instagram, YouTube Shorts, and TikTok. Optimised pacing, trending audio integration, captions.</div>
+    </div>
+    <div class="offer-card">
+      <div class="offer-title">Thumbnail Design</div>
+      <div class="offer-body">Click-worthy, brand-consistent thumbnails designed in Photoshop. AI-assisted design tools for rapid iteration and A/B testing concepts.</div>
+    </div>
+    <div class="offer-card">
+      <div class="offer-title">Wedding &amp; Event Films</div>
+      <div class="offer-body">Cinematic highlight reels with emotional arc, colour-graded to a premium look. Delivered fast, with attention to the moments that matter.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-wrap reveal">
+    <div>
+      <div class="section-label">Let's Work</div>
+      <div class="contact-big">GOT A<br>PROJECT<span>?</span><br>LET'S<br>TALK.</div>
+    </div>
+    <div>
+      <div class="contact-links">
+        <a href="mailto:ukey.ruchir14@gmail.com" class="contact-link">
+          <span class="contact-link-label">Email</span>
+          <span class="contact-link-value">ukey.ruchir14@gmail.com</span>
+        </a>
+        <a href="https://www.instagram.com/__i_am_ruchir?igsh=Y3EzM2Z2NTBzM2U2" target="_blank" class="contact-link">
+          <span class="contact-link-label">Instagram</span>
+          <span class="contact-link-value">@__i_am_ruchir</span>
+        </a>
+        <a href="https://www.linkedin.com/in/ruchir-ukey-297439191?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="contact-link">
+          <span class="contact-link-label">LinkedIn</span>
+          <span class="contact-link-value">linkedin.com/in/ruchir-ukey</span>
+        </a>
+        <a href="#" class="contact-link">
+          <span class="contact-link-label">Location</span>
+          <span class="contact-link-value">Mumbai, India</span>
+        </a>
+      </div>
+      <a href="mailto:ukey.ruchir14@gmail.com" class="btn-primary" style="margin-top: 36px; display: inline-block;">Send a Message</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-copy">© 2024 Ruchir Ukey &nbsp;—&nbsp; Video Editor &amp; Thumbnail Designer</div>
+  <a href="#" class="footer-back">↑ Back to top</a>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
